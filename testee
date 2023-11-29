@@ -49,3 +49,72 @@ jobs:
         schemachange -f $(PROJECT_FOLDER)/migrations -a $(SF_ACCOUNT) -u $(SF_USERNAME) -r $(SF_ROLE) -w $(SF_WAREHOUSE) -d $(SF_DATABASE_ENV1) -c $(SF_DATABASE_ENV1).SCHEMACHANGE.CHANGE_HISTORY --create-change-history-table
       env:
         SNOWFLAKE_PASSWORD: $(SF_PASSWORD_ENV1)
+
+
+
+
+
+
+
+
+
+
+
+
+# Deploy database changes using schemachange
+# https://github.com/Snowflake-Labs/schemachange
+# (see https://aka.ms/yaml for the YAML schema reference)
+trigger:
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - /migrations
+pool:
+  vmImage: 'ubuntu-latest'
+variables:
+- group: demo-variables
+
+jobs:
+- job: DeployToEnvironment1
+  displayName: 'Deploy to Environment 1'
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.8.x'
+    inputs:
+      versionSpec: '3.8.x'
+  - task: Bash@3
+    inputs:
+      targetType: 'inline'
+      script: |
+        echo 'Starting bash task'
+        echo "PROJECT_FOLDER $(PROJECT_FOLDER)"
+        python --version
+        echo 'Step 1: Installing schemachange'
+        pip install schemachange --upgrade
+        echo 'Step 2: Running schemachange for Environment 1'
+        schemachange -f $(PROJECT_FOLDER)/migrations -a $(SF_ACCOUNT) -u $(SF_USERNAME) -r $(SF_ROLE) -w $(SF_WAREHOUSE) -d $(SF_DATABASE_ENV1) -c $(SF_DATABASE_ENV1).SCHEMACHANGE.CHANGE_HISTORY --create-change-history-table
+      env:
+        SNOWFLAKE_PASSWORD: $(SF_PASSWORD_ENV1)
+
+- job: DeployToEnvironment2
+  displayName: 'Deploy to Environment 2'
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.8.x'
+    inputs:
+      versionSpec: '3.8.x'
+  - task: Bash@3
+    inputs:
+      targetType: 'inline'
+      script: |
+        echo 'Starting bash task'
+        echo "PROJECT_FOLDER $(PROJECT_FOLDER)"
+        python --version
+        echo 'Step 1: Installing schemachange'
+        pip install schemachange --upgrade
+        echo 'Step 2: Running schemachange for Environment 2'
+        schemachange -f $(PROJECT_FOLDER)/migrations -a $(SF_ACCOUNT) -u $(SF_USERNAME) -r $(SF_ROLE) -w $(SF_WAREHOUSE) -d $(SF_DATABASE_ENV2) -c $(SF_DATABASE_ENV2).SCHEMACHANGE.CHANGE_HISTORY --create-change-history-table
+      env:
+        SNOWFLAKE_PASSWORD: $(SF_PASSWORD_ENV2)
