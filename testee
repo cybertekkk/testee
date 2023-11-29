@@ -6,7 +6,8 @@ CREATE TABLE my_table (
 );
 
 INSERT INTO my_table (id, name, environment_name)
-VALUES (1, 'John Doe', '${environment
+VALUES (1, 'John Doe', '${environment}');
+
 
 # Deploy database changes using schemachange
 # https://github.com/Snowflake-Labs/schemachange
